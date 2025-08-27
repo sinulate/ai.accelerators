@@ -12,13 +12,13 @@ Focus order: **Blackwell (5000) → Ada (4000) → Ampere (3000)**. Works on sm\
 **Core accelerators**
 
 ```bat
-pip install -r https://raw.githubusercontent.com/sinulate/accel-py313/main/accel-py313.txt
+pip install -r https://github.com/sinulate/accel-py313/releases/download/v0.1.0/accel-py313.txt
 ```
 
 **ComfyUI bundle** (includes Core + Comfy specifics)
 
 ```bat
-pip install -r https://raw.githubusercontent.com/sinulate/accel-py313/main/accel-py313-comfyui.txt
+pip install -r https://github.com/sinulate/accel-py313/releases/download/v0.1.0/accel-py313-comfyui.txt
 ```
 
 ### What you get
