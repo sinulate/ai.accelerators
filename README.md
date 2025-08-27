@@ -1,151 +1,118 @@
-# Win-Accel Kits (PyTorch 2.8 · CUDA 12.9 · Py3.13)
+# accel-py313 — Windows CUDA 12.9 accelerator packs (Py 3.13, Torch 2.8)
 
-Super simple, **one-file installs** for a fast CUDA stack on Windows.
-Two preset profiles:
-
-* **`accel-py313.txt`** – base accelerators for DL/ML.
-* **`accel-py313-comfyui.txt`** – everything in base **+** ComfyUI ecosystem.
-
-Both target **PyTorch 2.8 (CUDA 12.9)** on **Python 3.13** and include local wheels for your custom kernels.
+Drop-in requirements files to set up **fast GPU inference/training** on Windows with **PyTorch 2.8.0 + CUDA 12.9**.
+Focus order: **Blackwell (5000) → Ada (4000) → Ampere (3000)**. Works on sm\_120 / sm\_100 / sm\_90 / sm\_80.
 
 ---
 
-## What’s inside
+## Quick install (CMD)
 
-* PyTorch 2.8 + cu129: `torch`, `torchvision`, `torchaudio`, `torchsde`
-* Kernel/graph compilers: `triton-windows`, `xformers`, `accelerate`
-* Your attention accelerators:
+> Open **Command Prompt (cmd.exe)** in an activated Conda env running **Python 3.13**.
 
-  * Local wheels (put these in `./wheels/`):
-
-    * `flash_attn-2.8.3-cp313-cp313-win_amd64.whl`
-    * `sageattn3-1.0.0-cp313-cp313-win_amd64.whl`
-  * Prebuilt SageAttention v2 (ABI3; works Py3.9–3.13):
-
-    * `https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post1/sageattention-2.2.0+cu129torch2.8.0-cp39-abi3-win_amd64.whl`
-* Useful libs for DL/diffusion: `numpy`, `einops`, `safetensors`, `packaging`, `ninja`, `transformers`, `diffusers`, `sentencepiece`, `tokenizers`
-* **ComfyUI profile** also adds `comfyui-embedded-docs`, `comfyui_frontend_package`, `comfyui_workflow_templates`, plus common video/net deps.
-
----
-
-## Quick start
-
-> ✅ Requires Windows 10/11 x64, **Python 3.13** (Conda recommended), and an NVIDIA GPU/driver compatible with CUDA 12.9.
-
-1. **Clone this repo** and place your two wheels under `./wheels/`:
-
-```
-wheels/
-  flash_attn-2.8.3-cp313-cp313-win_amd64.whl
-  sageattn3-1.0.0-cp313-cp313-win_amd64.whl
-```
-
-2. **Create / activate** a Python 3.13 environment (example with Conda):
+**Core accelerators**
 
 ```bat
-conda create -n py313 python=3.13 -y
-conda activate py313
+pip install -r https://raw.githubusercontent.com/sinulate/accel-py313/main/accel-py313.txt
 ```
 
-3. **Install one profile**:
-
-**Base accelerators**
+**ComfyUI bundle** (includes Core + Comfy specifics)
 
 ```bat
-pip install -r accel-py313.txt
+pip install -r https://raw.githubusercontent.com/sinulate/accel-py313/main/accel-py313-comfyui.txt
 ```
 
-**ComfyUI accelerators**
+### What you get
+
+* **PyTorch 2.8.0+cu129**, **torchvision**, **torchaudio**
+
+* **Triton-Windows** *prebuilt by* **@woct0rdho**
+
+* **Flash Attention 2** — *my* prebuilt Blackwell-optimized wheel
+
+* **Sage Attention 2** — *prebuilt by* **@woct0rdho**
+
+* **Sage Attention 3** — *my* prebuilt Blackwell-optimized wheel
+
+* **Sparge Attention** — *prebuilt by* **@woct0rdho**
+
+* Useful deps for ML/Diffusion stacks (einops, safetensors, packaging, ninja, transformers, etc.)
+
+---
+
+## Direct wheel links (from this release)
+
+If you want to install just the wheels:
 
 ```bat
-pip install -r accel-py313-comfyui.txt
+pip install --no-deps torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129
+pip install --no-deps triton-windows<3.5
+pip install --no-deps https://github.com/sinulate/accel-py313/releases/download/v0.1.0/flash_attn-2.8.3-cp313-cp313-win_amd64.whl
+pip install --no-deps https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post2/sageattention-2.2.0+cu128torch2.8.0.post2-cp39-abi3-win_amd64.whl
+pip install --no-deps https://github.com/sinulate/accel-py313/releases/download/v0.1.0/sageattn3-1.0.0-cp313-cp313-win_amd64.whl
+pip install --no-deps https://github.com/woct0rdho/SpargeAttn/releases/download/v0.1.0-windows.post1/spas_sage_attn-0.1.0+cu128torch2.8.0.post1-cp39-abi3-win_amd64.whl
 ```
 
-That’s it. The files already set the PyTorch CUDA index (`--extra-index-url`) and point to your local wheels.
+> **Credit:** SageAttention 2 (+ Sparge Attention) wheels referenced by the txt files are built and published by **[@woct0rdho](https://github.com/woct0rdho)**. Please ⭐ their repos.
 
 ---
 
-## Verify the install
+## Sanity checks (CMD one-liners)
 
-Minimal sanity checks:
-
-```py
-import torch
-print("Torch:", torch.__version__, "CUDA:", torch.version.cuda, "GPU:", torch.cuda.get_device_name())
-```
-
-FlashAttention 2 import:
-
-```py
-import flash_attn
-print("flash_attn OK")
-```
-
-SageAttention 3 smoke test (tiny shapes):
-
-```py
-import torch as t
-from sageattention import sageattn
-q=k=v=t.randn(2,256,16,64, device='cuda', dtype=t.float16)
-out = sageattn(q,k,v, tensor_layout='HND', is_causal=False)
-print("sageattn3 OK", tuple(out.shape))
-```
-
----
-
-## GPU compatibility (your wheels)
-
-Your custom builds include kernels for **SM 80, 90, 100, 120**.
-This broadly covers modern NVIDIA families (e.g., Ampere/Hopper/Blackwell). If you see:
-
-> `CUDA error: no kernel image is available for execution on the device`
-
-…your GPU’s compute capability isn’t one of the compiled targets (e.g., some Ada 40-series are **sm\_89**). In that case, rebuild with the right `-gencode` for your card (and ideally include PTX, e.g. `code=[sm_XY,compute_XY]`) or open an issue and we can add it.
-
----
-
-## Using the prebuilt SageAttention v2 (optional)
-
-The requirements files already include a direct wheel URL that works across Python 3.9–3.13:
-
-```
-https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post1/sageattention-2.2.0+cu129torch2.8.0-cp39-abi3-win_amd64.whl
-```
-
-This is handy for environments where you don’t want to pin to `cp313`.
-
----
-
-## ComfyUI notes
-
-The **ComfyUI** profile installs common extras used by nodes and templates. After installing the profile:
+**PyTorch + CUDA + device**
 
 ```bat
-# if you haven't already
-git clone https://github.com/comfyanonymous/ComfyUI.git
-cd ComfyUI
-python main.py
+python -c "import torch as t; print('Torch', t.__version__, 'CUDA', t.version.cuda); print('GPU[0]:', t.cuda.get_device_name(0)); print('SM:', t.cuda.get_device_capability(0))"
 ```
 
-(Adjust paths if you keep ComfyUI elsewhere—this repo only provides the Python deps.)
+**Triton (Windows)**
+
+```bat
+python -c "import triton, torch as t; print('Triton', triton.__version__); print('CUDA available:', t.cuda.is_available())"
+```
+
+**Flash Attention 2**
+
+```bat
+python -c "import torch as t; from flash_attn.flash_attn_interface import flash_attn_func; q=t.randn(2,256,16,64,device='cuda',dtype=t.float16); o=flash_attn_func(q,q,q,0.0,False,False); print('FA2 OK, shape:', tuple(o.shape))"
+```
+
+**Sage Attention 2**
+
+```bat
+python -c "import torch as t; from sageattention import sageattn as s2; q=k=v=t.randn(2,256,16,64,device='cuda',dtype=t.float16); o=s2(q,k,v,tensor_layout='HND',is_causal=False); print('SA2 OK, shape:', tuple(o.shape))"
+```
+
+**Sage Attention 3 (Blackwell-only)**
+
+```bat
+python -c "import torch as t; from sageattn.api import sageattn_blackwell as s3; q=k=v=t.randn(2,256,16,64,device='cuda',dtype=t.float16); o=s3(q,k,v,tensor_layout='HND',is_causal=False); print('SA3 OK, shape:', tuple(o.shape))"
+```
+
+**Sparge Attention**
+
+```bat
+python -c "import importlib, pkgutil; cand=['spas_sage_attn','sparge_attn','spargeattention']; name=next((n for n in cand if pkgutil.find_loader(n)), None); print('Sparge OK, module:', name or 'NOT FOUND')"
+```
 
 ---
 
-## Troubleshooting
+## Tips & Troubleshooting
 
-* **Wrong linker or “/usr/bin/link extra operand”**
-  You’re likely running from Git Bash. Use plain **Command Prompt (cmd.exe)** or PowerShell for installs.
-* **No compiler needed**
-  For **using** these wheels, you don’t need Visual Studio Build Tools. (You only need them if you’re rebuilding.)
-* **Out of memory during builds**
-  If you ever rebuild from source, limit NVCC workers (e.g., `--threads 2`) and reduce the number of `-gencode` targets, then re-add once stable.
+* Use **cmd.exe** (not PowerShell) for these one-liners.
+* If you see `ModuleNotFoundError: flash_attn_2_cuda` or `DLL load failed`, make sure you:
 
----
-
-## License
-
-This repo is just dependency glue + your build artifacts. Libraries retain their own licenses.
+  1. installed from the txt files above **and**
+  2. import `torch` before other CUDA extensions in the same process.
+* You need **Visual C++ build tools** + **CUDA 12.9 runtime** (installed with your NVIDIA driver for 550+).
 
 ---
 
-Happy accel-ing 🚀
+## License & Credits
+
+* This repo provides requirements files and a couple of Windows wheels I built (FlashAttention2, SageAttention3).
+* **SageAttention 2** and **Sparge Attention** wheels are by **@woct0rdho** — all credit to them for their awesome Windows builds.
+  Please visit and ⭐ their repositories.
+
+---
+
+**Enjoy the speed!** If these files helped, consider opening issues/PRs with tweaks for more GPUs or stacks.
