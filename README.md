@@ -1,39 +1,33 @@
-# py313 — Windows CUDA 12.9 accelerator packs (Py 3.13, Torch 2.8)
+# py312 — Windows CUDA 13.0 accelerator packs (Py 3.12, Torch 2.10)
 
-Drop-in requirements files to set up **fast GPU inference/training** on Windows with **PyTorch 2.8.0 + CUDA 12.9**.
+Drop-in requirements files to set up **fast GPU inference/training** on Windows with **PyTorch 2.10 + CUDA 13.0**.
 Focus order: **Blackwell (5000) → Ada (4000) → Ampere (3000)**. Works on sm\_120 / sm\_100 / sm\_90 / sm\_80.
 
 ---
 
 ## Quick install (CMD)
 
-> Open **Command Prompt (cmd.exe)** in an activated Conda env running **Python 3.13**.
-
-**Core accelerators**
-
-```bat
-pip install -r https://github.com/sinulate/accel-py313/releases/download/v0.1.0/accel-py313.txt
-```
-
-**ComfyUI bundle** (includes Core + Comfy specifics)
-
-```bat
-pip install -r https://github.com/sinulate/accel-py313/releases/download/v0.1.0/accel-py313-comfyui.txt
-```
+> Open **Command Prompt (cmd.exe)** in an activated Conda env running **Python 3.12**.
 
 ### What you get
 
-* **PyTorch 2.8.0+cu129**, **torchvision**, **torchaudio**
+* **PyTorch 2.10.0+cu130**, **torchvision**, **torchaudio** — *prebuilt by* **[pytorch.org/get-started/locally](https://pytorch.org/get-started/locally)**
 
-* **Triton-Windows** *prebuilt by* **@woct0rdho**
+* **xFormers** — *prebuilt by* **[huggingface.co/Wildminder/AI-windows-whl](https://huggingface.co/Wildminder/AI-windows-whl)**
 
-* **Flash Attention 2** — *my* prebuilt Blackwell-optimized wheel
+* **Flash Attention 2** — *prebuilt by* **[huggingface.co/Wildminder/AI-windows-whl](https://huggingface.co/Wildminder/AI-windows-whl)**
 
-* **Sage Attention 2** — *prebuilt by* **@woct0rdho**
+* **Triton-Windows** — *prebuilt by* **[github.com/woct0rdho/triton-windows](https://github.com/woct0rdho/triton-windows)**
 
-* **Sage Attention 3** — *my* prebuilt Blackwell-optimized wheel
+* **Sage Attention 2** — *prebuilt by* **[github.com/github.com/woct0rdho/SageAttention](https://github.com/woct0rdho/SageAttention)**
 
-* **Sparge Attention** — *prebuilt by* **@woct0rdho**
+* **Sage Attention 3** — *prebuilt by* **[github.com/mengqin/SageAttention](https://github.com/mengqin/SageAttention)**
+
+* **Sparge Attention** — *prebuilt by* **[github.com/woct0rdho/SpargeAttn](https://github.com/woct0rdho/SpargeAttn)**
+
+* **Nunchaku** — *prebuilt by* **[github.com/nunchaku-ai/nunchaku](https://github.com/nunchaku-ai/nunchaku)**
+
+* **ComfyUI-TwinFlow** — *prebuilt by* **[github.com/mengqin/ComfyUI-TwinFlow](https://github.com/mengqin/ComfyUI-TwinFlow)**
 
 * Useful deps for ML/Diffusion stacks (einops, safetensors, packaging, ninja, transformers, etc.)
 
@@ -44,12 +38,17 @@ pip install -r https://github.com/sinulate/accel-py313/releases/download/v0.1.0/
 If you want to install just the wheels:
 
 ```bat
-pip install --no-deps torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129
-pip install --no-deps triton-windows<3.5
-pip install --no-deps https://github.com/sinulate/accel-py313/releases/download/v0.1.0/flash_attn-2.8.3-cp313-cp313-win_amd64.whl
-pip install --no-deps https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post2/sageattention-2.2.0+cu128torch2.8.0.post2-cp39-abi3-win_amd64.whl
-pip install --no-deps https://github.com/sinulate/accel-py313/releases/download/v0.1.0/sageattn3-1.0.0-cp313-cp313-win_amd64.whl
-pip install --no-deps https://github.com/woct0rdho/SpargeAttn/releases/download/v0.1.0-windows.post1/spas_sage_attn-0.1.0+cu128torch2.8.0.post1-cp39-abi3-win_amd64.whl
+pip install -U --no-cache-dir "torch" "torchvision" "torchaudio" --index-url "https://download.pytorch.org/whl/cu130"
+pip install -U --no-deps --no-cache-dir "https://huggingface.co/Wildminder/AI-windows-whl/resolve/main/xformers-0.0.34%2Bd20260123.cu130torch2.10-cp39-abi3-win_amd64.whl"
+pip install -U --no-deps --no-cache-dir "https://huggingface.co/Wildminder/AI-windows-whl/resolve/main/flash_attn-2.8.3%2Bd20260121.cu130torch2.10.0cxx11abiTRUE-cp312-cp312-win_amd64.whl --no-cache-dir"
+pip install -U --no-deps --no-cache-dir "triton-windows<3.7"
+pip install -U --no-deps --no-cache-dir "https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post4/sageattention-2.2.0+cu130torch2.9.0andhigher.post4-cp39-abi3-win_amd64.whl"
+pip install -U --no-deps --no-cache-dir "https://github.com/mengqin/SageAttention/releases/download/20251229/sageattn3-1.0.0+cu130torch291-cp312-cp312-win_amd64.whl"
+pip install -U --no-deps --no-cache-dir "https://github.com/woct0rdho/SpargeAttn/releases/download/v0.1.0-windows.post4/spas_sage_attn-0.1.0+cu130torch2.9.0andhigher.post4-cp39-abi3-win_amd64.whl"
+pip install -U --no-deps --no-cache-dir "https://github.com/nunchaku-ai/nunchaku/releases/download/v1.2.1/nunchaku-1.2.1+cu13.0torch2.10-cp312-cp312-win_amd64.whl"
+
+cd ComfyUI/custom_nodes
+git clone https://github.com/mengqin/ComfyUI-TwinFlow
 ```
 
 > **Credit:** SageAttention 2 (+ Sparge Attention) wheels referenced by the txt files are built and published by **[@woct0rdho](https://github.com/woct0rdho)**. Please ⭐ their repos.
